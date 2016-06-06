@@ -43,7 +43,7 @@ func (s *PartyLock) Lock() (status bool, err error) {
 
 	err = s.consulClient.DeleteWait()
 	if err != nil {
-		return false, s.consulClient.DeleteWait()
+		return false, err
 	}
 
 	if locksCount > (s.Capacity - 1) {
