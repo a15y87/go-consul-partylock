@@ -8,10 +8,17 @@ type PartyLock struct {
 	Capacity     int
 }
 
-func New(TaskPath string, TaskWeight string, ConsulAddress string, LockTimeout int) (PartyLock *PartyLock, err error) {
-	PartyLock.LockTimeout = LockTimeout
-	err = PartyLock.ConsulClient.Init(TaskPath, TaskWeight, ConsulAddress)
-	return
+func New(TaskPath string, TaskWeight string, ConsulAddress string, LockTimeout int, Capacity int) (partyLock *PartyLock, err error) {
+
+	var LockClient ConsulLockClient
+
+	err = LockClient.Init(TaskPath, TaskWeight, ConsulAddress)
+	if err != nil {
+		return nil, err
+	}
+	partyLock=&PartyLock{&LockClient, LockTimeout, Capacity}
+
+	return partyLock, err
 }
 
 func (s *PartyLock) Lock() (status bool, err error) {
