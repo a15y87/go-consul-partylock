@@ -1,4 +1,4 @@
-package go_consul_partylock
+package consul_partylock
 
 import (
 	"github.com/hashicorp/consul/api"
