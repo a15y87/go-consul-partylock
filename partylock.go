@@ -4,11 +4,11 @@ import "time"
 
 type PartyLock struct {
 	consulClient *consulLockClient
-	LockTimeout  int
+	LockTimeout  time.Duration
 	Capacity     int
 }
 
-func New(TaskPath string, TaskWeight string, ConsulAddress string, LockTimeout int, Capacity int) (partyLock *PartyLock, err error) {
+func New(TaskPath string, TaskWeight string, ConsulAddress string, LockTimeout time.Duration, Capacity int) (partyLock *PartyLock, err error) {
 
 	var LockClient consulLockClient
 
@@ -27,7 +27,7 @@ func (s *PartyLock) Lock() (status bool, err error) {
 		return false, err
 	}
 
-	time.Sleep(time.Duration(s.LockTimeout) * time.Millisecond)
+	time.Sleep(s.LockTimeout)
 	myPosition, err := s.consulClient.GetWaitPosition()
 	if err != nil {
 		return false, s.consulClient.DeleteWait()
@@ -55,6 +55,6 @@ func (s *PartyLock) Lock() (status bool, err error) {
 }
 
 func (s *PartyLock) UnLock() (status bool, err error) {
-	time.Sleep(time.Duration(s.LockTimeout) * time.Millisecond)
+	time.Sleep(s.LockTimeout)
 	return s.consulClient.DeleteLock()
 }
