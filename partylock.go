@@ -16,7 +16,7 @@ func New(TaskPath string, TaskWeight string, ConsulAddress string, LockTimeout i
 	if err != nil {
 		return nil, err
 	}
-	partyLock=&PartyLock{&LockClient, LockTimeout, Capacity}
+	partyLock = &PartyLock{&LockClient, LockTimeout, Capacity}
 
 	return partyLock, err
 }
@@ -33,7 +33,6 @@ func (s *PartyLock) Lock() (status bool, err error) {
 		return false, s.ConsulClient.DeleteWait()
 	}
 	if myPosition > (s.Capacity - 1) {
-
 		return false, s.ConsulClient.DeleteWait()
 	}
 

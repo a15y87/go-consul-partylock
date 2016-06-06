@@ -20,6 +20,8 @@ type ConsulLockClient struct {
 }
 
 func (c *ConsulLockClient) Init(TaskPath, TaskWeight, ConsulAddress string) (err error) {
+	c.TaskPath = TaskPath
+	c.TaskWeight = TaskWeight
 	se := &api.SessionEntry{}
 	se.TTL = "10s"
 	se.Behavior = "delete"
