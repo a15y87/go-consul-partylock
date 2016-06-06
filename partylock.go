@@ -20,7 +20,7 @@ func (s *PartyLock) Lock() (status bool, err error) {
 		return false, err
 	}
 
-	time.Sleep(time.Duration(time.Millisecond * s.LockTimeout))
+	time.Sleep(time.Duration(s.LockTimeout) * time.Millisecond)
 	myPosition, err := s.ConsulClient.GetWaitPosition()
 	if err != nil {
 		return false, s.ConsulClient.DeleteWait()
@@ -48,12 +48,11 @@ func (s *PartyLock) Lock() (status bool, err error) {
 	return status, err
 }
 
-
 func (s *PartyLock) UnLock() (status bool, err error) {
-	time.Sleep(time.Duration(time.Millisecond * s.LockTimeout))
+	time.Sleep(time.Duration(s.LockTimeout) * time.Millisecond)
 	return s.ConsulClient.DeleteLock()
 }
 
-func (s *PartyLock) Destroy() (status bool, err error) {
+func (s *PartyLock) Destroy() (err error) {
 	return s.ConsulClient.DestroySession()
 }

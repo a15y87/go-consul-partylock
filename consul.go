@@ -77,7 +77,11 @@ func (c *ConsulLockClient) AddLock() (status bool, err error) {
 
 func (c *ConsulLockClient) DeleteLock() (status bool, err error) {
 	kv := c.consulClient.KV()
-	return kv.Delete(c.consulPathLockTask, nil)
+	_, err = kv.Delete(c.consulPathLockTask, nil)
+	if err != nil {
+		return false, err
+	}
+	return true, err
 
 }
 
@@ -91,6 +95,7 @@ func (c *ConsulLockClient) GetLocksCount() (count int, err error) {
 	return count, err
 }
 
-func (c *ConsulLockClient) DestroySession() (status bool, err error) {
-	return c.consulClient.Session().Destroy(c.consulSession, nil)
+func (c *ConsulLockClient) DestroySession() (err error) {
+	_, err = c.consulClient.Session().Destroy(c.consulSession, nil)
+	return err
 }
