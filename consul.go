@@ -62,7 +62,7 @@ func (c *ConsulLockClient) GetWaitPosition() (position int, err error) {
 	kv := c.consulClient.KV()
 	waits, _, err := kv.Keys(c.consulPathWait, ";", nil)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 	position = sort.SearchStrings(waits, c.consulPathWaitTask)
 	return position, err
@@ -75,22 +75,22 @@ func (c *ConsulLockClient) AddLock() (status bool, err error) {
 	return status, err
 }
 
-func (c *ConsulLockClient) DeleteLock() (err error) {
+func (c *ConsulLockClient) DeleteLock() (status bool, err error) {
 	kv := c.consulClient.KV()
-	_, err = kv.Delete(c.consulPathLockTask, nil)
-	return err
+	return kv.Delete(c.consulPathLockTask, nil)
+
 }
 
 func (c *ConsulLockClient) GetLocksCount() (count int, err error) {
 	kv := c.consulClient.KV()
 	locks, _, err := kv.Keys(c.consulPathLock, ";", nil)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 	count = len(locks)
 	return count, err
 }
 
-func (c *ConsulLockClient) DestroySession() (err error) {
+func (c *ConsulLockClient) DestroySession() (status bool, err error) {
 	return c.consulClient.Session().Destroy(c.consulSession, nil)
 }
