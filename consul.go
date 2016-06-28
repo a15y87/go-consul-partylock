@@ -9,12 +9,12 @@ import (
 type consulLockClient struct {
 	taskPath           string
 	taskWeight         string
-	consulSession      string
+	ConsulSession      string
 	consulClient       *api.Client
 	consulPathWait     string
-	consulPathWaitTask string
+	ConsulPathWaitTask string
 	consulPathLock     string
-	consulPathLockTask string
+	ConsulPathLockTask string
 }
 
 func (c *consulLockClient) Init(TaskPath, TaskWeight, ConsulAddress string) (err error) {
@@ -32,29 +32,29 @@ func (c *consulLockClient) Init(TaskPath, TaskWeight, ConsulAddress string) (err
 		return err
 	}
 
-	c.consulSession, _, err = c.consulClient.Session().Create(se, nil)
+	c.ConsulSession, _, err = c.consulClient.Session().Create(se, nil)
 	if err != nil {
 		return err
 	}
 
 	c.consulPathWait = strings.Join([]string{c.taskPath, "/.wait/"}, "")
 	c.consulPathLock = strings.Join([]string{c.taskPath, "/.locked/"}, "")
-	c.consulPathWaitTask = strings.Join([]string{c.consulPathWaitTask, c.taskWeight, "-", c.consulSession}, "")
-	c.consulPathLockTask = strings.Join([]string{c.consulPathLock, c.taskWeight, "-", c.consulSession}, "")
+	c.ConsulPathWaitTask = strings.Join([]string{c.ConsulPathWaitTask, c.taskWeight, "-", c.ConsulSession}, "")
+	c.ConsulPathLockTask = strings.Join([]string{c.consulPathLock, c.taskWeight, "-", c.ConsulSession}, "")
 
 	return nil
 }
 
 func (c *consulLockClient) AddWait() (err error) {
 	kv := c.consulClient.KV()
-	p := &api.KVPair{Key: c.consulPathWaitTask, Value: []byte("0"), Session: c.consulSession}
+	p := &api.KVPair{Key: c.ConsulPathWaitTask, Value: []byte("0"), Session: c.ConsulSession}
 	_, _, err = kv.Acquire(p, nil)
 	return err
 }
 
 func (c *consulLockClient) DeleteWait() (err error) {
 	kv := c.consulClient.KV()
-	_, err = kv.Delete(c.consulPathWaitTask, nil)
+	_, err = kv.Delete(c.ConsulPathWaitTask, nil)
 	return err
 }
 
@@ -64,20 +64,20 @@ func (c *consulLockClient) GetWaitPosition() (position int, err error) {
 	if err != nil {
 		return 0, err
 	}
-	position = sort.SearchStrings(waits, c.consulPathWaitTask)
+	position = sort.SearchStrings(waits, c.ConsulPathWaitTask)
 	return position, err
 }
 
 func (c *consulLockClient) AddLock() (status bool, err error) {
 	kv := c.consulClient.KV()
-	p := &api.KVPair{Key: c.consulPathLockTask, Value: []byte("0"), Session: c.consulSession}
+	p := &api.KVPair{Key: c.ConsulPathLockTask, Value: []byte("0"), Session: c.ConsulSession}
 	status, _, err = kv.Acquire(p, nil)
 	return status, err
 }
 
 func (c *consulLockClient) DeleteLock() (status bool, err error) {
 	kv := c.consulClient.KV()
-	_, err = kv.Delete(c.consulPathLockTask, nil)
+	_, err = kv.Delete(c.ConsulPathLockTask, nil)
 	if err != nil {
 		return false, err
 	}
