@@ -4,7 +4,6 @@ import (
 	"github.com/hashicorp/consul/api"
 	"sort"
 	"strings"
-
 )
 
 type consulLockClient struct {
@@ -16,7 +15,6 @@ type consulLockClient struct {
 	ConsulPathWaitTask string
 	consulPathLock     string
 	ConsulPathLockTask string
-	Waits			[]string
 }
 
 func (c *consulLockClient) Init(TaskPath, TaskWeight, ConsulAddress string) (err error) {
@@ -39,9 +37,9 @@ func (c *consulLockClient) Init(TaskPath, TaskWeight, ConsulAddress string) (err
 		return err
 	}
 
-	c.consulPathWait = strings.Join([]string{c.taskPath, "/.wait/"}, "")
-	c.consulPathLock = strings.Join([]string{c.taskPath, "/.locked/"}, "")
-	c.ConsulPathWaitTask = strings.Join([]string{c.ConsulPathWaitTask, c.taskWeight, "-", c.ConsulSession}, "")
+	c.consulPathWait = c.taskPath + "/.wait/"
+	c.consulPathLock = c.taskPath + "/.locked/"
+	c.ConsulPathWaitTask = strings.Join([]string{c.consulPathWait, c.taskWeight, "-", c.ConsulSession}, "")
 	c.ConsulPathLockTask = strings.Join([]string{c.consulPathLock, c.taskWeight, "-", c.ConsulSession}, "")
 
 	return nil
@@ -62,12 +60,11 @@ func (c *consulLockClient) DeleteWait() (err error) {
 
 func (c *consulLockClient) GetWaitPosition() (position int, err error) {
 	kv := c.consulClient.KV()
-	c.Waits, _, err = kv.Keys(c.consulPathWait, ";", nil)
+	waits, _, err := kv.Keys(c.consulPathWait, "", nil)
 	if err != nil {
 		return 0, err
 	}
-	position = sort.SearchStrings(c.Waits, c.ConsulPathWaitTask)
-
+	position = sort.SearchStrings(waits, c.ConsulPathWaitTask)
 	return position, err
 }
 
