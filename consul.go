@@ -4,6 +4,7 @@ import (
 	"github.com/hashicorp/consul/api"
 	"sort"
 	"strings"
+
 )
 
 type consulLockClient struct {
@@ -15,6 +16,7 @@ type consulLockClient struct {
 	ConsulPathWaitTask string
 	consulPathLock     string
 	ConsulPathLockTask string
+	Waits			[]string
 }
 
 func (c *consulLockClient) Init(TaskPath, TaskWeight, ConsulAddress string) (err error) {
@@ -60,11 +62,12 @@ func (c *consulLockClient) DeleteWait() (err error) {
 
 func (c *consulLockClient) GetWaitPosition() (position int, err error) {
 	kv := c.consulClient.KV()
-	waits, _, err := kv.Keys(c.consulPathWait, ";", nil)
+	c.Waits, _, err = kv.Keys(c.consulPathWait, ";", nil)
 	if err != nil {
 		return 0, err
 	}
-	position = sort.SearchStrings(waits, c.ConsulPathWaitTask)
+	position = sort.SearchStrings(c.Waits, c.ConsulPathWaitTask)
+
 	return position, err
 }
 
