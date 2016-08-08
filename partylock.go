@@ -62,3 +62,7 @@ func (s *PartyLock) UnLock() (status bool, err error) {
 func (s *PartyLock) UpdateLock() (status bool, err error) {
 	return s.ConsulClient.AddLock()
 }
+
+func (s *PartyLock) UpdateSession() (status bool, err error) {
+	return s.ConsulClient.RenewSession()
+}
