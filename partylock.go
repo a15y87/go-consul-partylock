@@ -58,3 +58,7 @@ func (s *PartyLock) UnLock() (status bool, err error) {
 	time.Sleep(s.LockTimeout)
 	return s.ConsulClient.DeleteLock()
 }
+
+func (s *PartyLock) UpdateLock() (status bool, err error) {
+	return s.ConsulClient.AddLock()
+}
