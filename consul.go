@@ -69,7 +69,8 @@ func (c *consulLockClient) GetWaitPosition() (position int, err error) {
 }
 
 func (c *consulLockClient) RenewSession() (err error) {
-	return c.consulClient.Session().Renew(c.ConsulSessionID, nil)
+	_, _, err = c.consulClient.Session().Renew(c.ConsulSessionID, nil)
+	return err
 }
 
 
